@@ -1,0 +1,127 @@
+
+
+question1:
+1) SELECT FNAME FROM STUDENT WHERE FNAME LIKE '%A%'
+
+2) SELECT AVG(GPA) AS GPA_AVG FROM STUDENT;
+
+3) select * from student s, COURSE C, STUDENT_COURSE T
+   WHERE s.stud_num = t.stud_num AND T.course_num = S.course_num
+   AND COURSE_DESG = 'ME'
+
+4) ALTER TABLE STUDENT ADD GRADE VARCHAR(03);
+
+
+5)SELECT FNAME,LNAME,AGE,GPA,STU_NUM,COURSE_NUM,COURSE_DESG
+  inner join student_course t on s.stud_num = t.stud_num
+ inner join course c on c.course_num = t.course_num
+**********************
+
+QUESTION 2:
+
+A.
+THERE IS NO ANY ERROR IN QUERY IT WILL DISPLAY ZERO ROWS AS
+NO ANY NAME CONTAIN ON AS SUBSTRING.
+
+B.
+
+INVALID USE OF WHERE AS CONDITION IS NOT SPECIFIED.
+
+C.
+
+TO IS INVALID SYMBOL
+
+
+*******************
+QUESTION 3:
+
+
+     IDENTIFICATION DIVISION.                                      
+   PROGRAM-ID. PROG03.                                           
+   ENVIRONMENT DIVISION.                                         
+   DATA DIVISION.                                                
+   WORKING-STORAGE SECTION.                                      
+              
+      EXEC SQL                                         
+       INCLUDE STUDENT                                       
+    END-EXEC.  
+     EXEC SQL                                         
+       INCLUDE COURSE                                       
+    END-EXEC.                                            
+     EXEC SQL                                                 
+       INCLUDE SQLCA                                          
+     END-EXEC.                                                                                                                 
+   01 WS-TABLE-FLAG        PIC X(01) VALUE 'N'.                          
+     88 END-OF-ROW    VALUE 'Y'.                                         
+   PROCEDURE DIVISION.                                                   
+    MAIN-PARA.                                                                           
+                                                       
+       PERFORM 1000-INIT-PARA UNTIL END-OF-ROW                    
+                                         
+       STOP RUN.
+    1000-INIT-PARA.                                                      
+     EXEC SQL
+      SELECT STUD_NUM, COURSE_NUM,
+      COURSE_DESC FROM STUDENT_TABLE S,
+      COURSE_TABLE C OREDR BY COURSE_NUM, STUD_NUM                                                   
+     END-EXEC.                                                          
+       DISPLAY 'SELECT SQL = ', SQLCODE                                  
+       EVALUATE SQLCODE                                                  
+         WHEN ZERO                                                       
+          DISPLAY 'RECORD IS:'                                              
+         WHEN 100                                                        
+            MOVE 'Y' TO WS-TABLE-FLAG  
+         WHEN OTHER                                                      
+           DISPLAY 'ERROR'                                               
+        END-EVALUATE.                                                    
+  
+                                                  
+    
+
+
+
+*****************************
+
+
+QUESTION 4:
+
+
+  IDENTIFICATION DIVISION.                            
+  PROGRAM-ID. PROG04.                                 
+  ENVIRONMENT DIVISION.                                                                                 
+  DATA DIVISION.                                      
+  WORKING-STORAGE SECTION.                            
+  01 WS-STUD-NUM      PIC X(06) VALUE SPACES.         
+    EXEC SQL                                         
+       INCLUDE STUDENT                                       
+    END-EXEC.  
+     EXEC SQL                                         
+       INCLUDE COURSE                                       
+    END-EXEC.                                            
+     EXEC SQL                                                 
+       INCLUDE SQLCA                                          
+     END-EXEC.                                                
+  01 WS-TABLE-FLAG        PIC X(01) VALUE 'N'.        
+   88 END-OF-ROW    VALUE 'Y'.                                                
+  PROCEDURE DIVISION.                                                   
+   MAIN-PARA.                                                           
+      PERFORM 1000-INIT-PARA UNTIL END-OF-ROW   
+      STOP RUN.                                                         
+                                                                        
+   1000-INIT-PARA.                                                      
+      ACCEPT WS-STUD-NUM                                                  
+      EXEC SQL
+      DELETE FROM STUDENT_COURSE WHERE STU_NUM = :WS-STUD-NUM                                                           
+      END-EXEC.                                                          
+       DISPLAY 'SELECT SQL = ', SQLCODE                                  
+       EVALUATE SQLCODE                                                  
+         WHEN ZERO                                                       
+          DISPLAY 'AS PER THE REQUEST,THE RECORD IS BEEN DELETED'                                              
+         WHEN 100                                                        
+            MOVE 'Y' TO WS-TABLE-FLAG  
+         WHEN OTHER                                                      
+           DISPLAY 'STUDENT NOT FOUND'                                               
+        END-EVALUATE.                                                    
+  
+               
+                                                    

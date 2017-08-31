@@ -1,0 +1,216 @@
+
+130767
+
+QUESTION 01
+
+A)
+SELECT * FROM STUDENT
+WHERE FNAME LIKE 'A%';
+
+B)
+SELECT AVG(SUM(3.45+2.45+1.7+3.55+3))
+FROM STUDENT;
+
+C)
+SELECT * FROM STUDENT S, COURSE C, STUDENT_COURSE A
+WHERE COURSE_DESC LIKE 'ME'
+GROUP BY STU_NUM, COURSE_NUM;
+
+D)
+SELECT * FROM STUDENT
+ALTER TABLE STUDENT ADD GRADE VARCHAR(01) NULL;
+
+E)
+SELECT * FROM STUDENT S, COURSE C, STUDENT_COURSE A
+WHERE STU_NUM.S = STU_NUM.A
+      AND COURSE_NUM.A = COURSE_NUM.C
+GROUP BY STU_NUM, COURSE_NUM;    
+
+
+
+QUESTION 02
+
+A)
+SELECT FNAME, LNAME, MIN(AGE)
+FROM STUDENT
+WHERE LNAME LIKE 'ON%'
+GROUP BY NAME;
+
+B)
+SELECT * FROM COURSE
+WHERE (SELECT MIN(COURSE_NUM)
+FROM STUDENT_COURSE);
+
+C)
+UPDATE COURSE
+SET COURSE_NUM < 350
+WHERE COURSE_DESC = 'ME';
+
+
+
+
+QUESTION 03
+
+IDENTIFICATION DIVISION.                  
+PROGRAM-ID. PROG3.                        
+ENVIRONMENT DIVISION.                     
+INPUT-OUTPUT SECTION.                     
+FILE-CONTROL.                             
+     SELECT REPORT-FILE ASSIGN TO REPFILE 
+     FILE STATUS IS WS-REP-STAT.  
+DATA DIVISION.                    
+FILE SECTION.                     
+FD  REPORT-FILE                  
+   RECORD CONTAINS 80 CHARACTERS 
+   RECORDING MODE IS F.          
+01 REPORT-RECORD PIC X(80).      
+WORKING-STORAGE SECTION.
+01  DETAIL-LINE
+    03  WS-STU-NUM      PIC X(06)
+    03  FILLER          PIC X(01)
+    03  WS-FNAME        PIC X(10)
+    03  FILLER          PIC X(01)
+    03  WS-COURSE-DESC  PIC X(02)
+    03  FILLER          PIC X(01)
+    03  WS-COURSE-NUM   PIC X(03)
+    03  FILLER          PIC X(01)    
+    03  WS-AGE          PIC X(02)
+    03  FILLER          PIC X(01)
+    03  WS-GPA          PIC X(03)
+    03  FILLER          PIC X(01)
+    03  WS-LNAME        PIC X(10)
+     EXEC SQL                                       
+        INCLUDE STUDENT                              
+       END-EXEC                                       
+       EXEC SQL                               
+        INCLUDE COURSE                      
+       END-EXEC                               
+       EXEC SQL                               
+        INCLUDE SC                      
+       END-EXEC                               
+       EXEC SQL                               
+        INCLUDE SQLCA                         
+       END-EXEC                               
+       EXEC SQL                               
+            DECLARE STU_CUR CURSOR FOR        
+            SELECT * FROM STUDENT           
+            WHERE S.STU_NUM = :STU-NUM
+       END-EXEC.                              
+PROCEDURE DIVISION.                          
+MAIN-PARA.
+    ACCEPT STU-CUR
+    PERFORM PROCESS-PARA
+    STOP RUN.
+PROCESS-PARA.
+    EXEC SQL                                 
+      OPEN STU-CUR                           
+    END-EXEC                                 
+    EXEC SQL      
+      FETCH STU_CUR INTO :STUDENT-COURSE  
+    END-EXEC 
+    IF WS-STU-NUM = SC.STU-NUM
+       MOVE C.CURSOR-NUM TO SC.CURSOR-NUM
+       PERFORM MOVE-PARA
+    END-IF   
+    EXEC SQL                                 
+      CLOSE STU-CUR                          
+    END-EXEC
+    PERFORM END-PARA. 
+MOVE-PARA.
+    MOVE S.STU-NUM TO WS-STU-NUM
+    MOVE SC.COURSE-NUM TO WS-COURSE-NUM
+    MOVE C.COURSE-DESC TO WS-COURSE-DESC
+    MOVE GPA TO WS-GPA
+    MOVE FNAME TO WS-FNAME
+    PERFORM WRITE-PARA. 
+WRITE-PARA.                               
+    WRITE REPORT-RECORD FROM DETAIL-LINE.     
+END-PARA.             
+    CLOSE REPORT-FILE.
+
+
+
+
+QUESTION 04
+
+IDENTIFICATION DIVISION.                  
+PROGRAM-ID. PROG4.                        
+ENVIRONMENT DIVISION.                     
+INPUT-OUTPUT SECTION.                     
+FILE-CONTROL.                             
+     SELECT REPORT-FILE ASSIGN TO REPFILE 
+     FILE STATUS IS WS-REP-STAT.  
+DATA DIVISION.                    
+FILE SECTION.                     
+FD  REPORT-FILE                  
+   RECORD CONTAINS 80 CHARACTERS 
+   RECORDING MODE IS F.          
+01 REPORT-RECORD PIC X(80).      
+WORKING-STORAGE SECTION.
+01  DETAIL-LINE
+    03  WS-STU-NUM      PIC X(06)
+    03  FILLER          PIC X(01)
+    03  WS-FNAME        PIC X(10)
+    03  FILLER          PIC X(01)
+    03  WS-COURSE-NUM   PIC X(03)
+    03  FILLER          PIC X(01)    
+    03  WS-AGE          PIC X(02)
+    03  FILLER          PIC X(01)
+    03  WS-GPA          PIC X(03)
+    03  FILLER          PIC X(01)
+    03  WS-LNAME        PIC X(10)
+   
+       EXEC SQL                                       
+        INCLUDE STUDENT                              
+       END-EXEC                                       
+       EXEC SQL                               
+        INCLUDE COURSE                      
+       END-EXEC                               
+       EXEC SQL                              
+        INCLUDE SC                      
+       END-EXEC                               
+       EXEC SQL                               
+        INCLUDE SQLCA                         
+       END-EXEC                               
+       EXEC SQL                               
+            DECLARE STU_CUR CURSOR FOR        
+            SELECT * FROM STUDENT           
+            WHERE S.STU_NUM = :STU-NUM
+       END-EXEC.                              
+PROCEDURE DIVISION.                          
+MAIN-PARA.
+    ACCEPT STU-CUR
+    PERFORM PROCESS-PARA
+    STOP RUN.
+PROCESS-PARA.
+    EXEC SQL                                 
+      OPEN STU-CUR                           
+    END-EXEC                                 
+    EXEC SQL      
+      FETCH STU_CUR INTO :STUDENT-COURSE  
+    END-EXEC 
+    IF WS-STU-NUM = SC.STU-NUM
+       MOVE C.CURSOR-NUM TO SC.CURSOR-NUM
+       PERFORM DELETE-PARA
+       PERFORM MOVE-PARA
+    END-IF   
+    EXEC SQL                                 
+      CLOSE STU-CUR                          
+    END-EXEC 
+    PERFORM END-PARA.
+MOVE-PARA.
+    MOVE S.STU-NUM TO WS-STU-NUM
+    MOVE SC.COURSE-NUM TO WS-COURSE-NUM
+    MOVE LNAME TO WS-LNAME
+    MOVE GPA TO WS-GPA
+    MOVE FNAME TO WS-FNAME
+    PERFORM WRITE-PARA. 
+DELETE-PARA.
+    EXEC SQL
+      SELECT * FROM COURSE
+      DELETE FROM COURSE;   
+    END-EXEC.             
+WRITE-PARA.                               
+    WRITE REPORT-RECORD FROM DETAIL-LINE.     
+END-PARA.             
+    CLOSE REPORT-FILE.                                  
